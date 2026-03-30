@@ -172,10 +172,12 @@ OnlineBeauticianBooking/
 ```bash
 cd backend
 
-# Configure database in src/main/resources/application.properties
-# spring.datasource.url=jdbc:mysql://localhost:3306/beautician_booking_db
-# spring.datasource.username=root
-# spring.datasource.password=YOUR_PASSWORD
+# Use environment variables from backend/.env.example
+# Minimum local variables:
+# DB_URL=jdbc:mysql://localhost:3306/beautician_booking_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+# DB_USERNAME=root
+# DB_PASSWORD=YOUR_PASSWORD
+# APP_JWT_SECRET=replace-with-a-long-random-secret
 
 # Build and run
 mvn spring-boot:run
@@ -187,6 +189,7 @@ Backend runs at `http://localhost:8080`
 
 ```bash
 cd frontend
+# Set VITE_API_URL=http://localhost:8080/api
 npm install
 npm run dev
 ```
@@ -238,10 +241,80 @@ mvn test
 
 ## Environment Variables
 
-| Variable        | Description               | Default                  |
-|-----------------|---------------------------|--------------------------|
-| `MAIL_USERNAME` | Gmail address for emails  | your-email@gmail.com     |
-| `MAIL_PASSWORD` | Gmail app password        | your-app-password        |
+### Backend
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Port used in cloud hosting | `8080` |
+| `DB_URL` | MySQL JDBC URL | `jdbc:mysql://HOST:3306/beautician_booking_db?...` |
+| `DB_USERNAME` | MySQL username | `root` |
+| `DB_PASSWORD` | MySQL password | `your-password` |
+| `APP_CORS_ALLOWED_ORIGINS` | Allowed frontend origin(s), comma-separated | `https://your-app.vercel.app` |
+| `APP_JWT_SECRET` | Long random secret for JWT signing | `change-me` |
+| `APP_JWT_EXPIRATION_MS` | JWT expiry in ms | `86400000` |
+| `MAIL_USERNAME` | Gmail address for emails | `your-email@gmail.com` |
+| `MAIL_PASSWORD` | Gmail app password | `your-app-password` |
+
+### Frontend
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `VITE_API_URL` | Public backend API base URL | `https://your-backend-domain/api` |
+
+## Quick Hosting Guide
+
+### Best beginner setup for this project
+
+Use:
+- **Vercel** for the frontend
+- **Railway** for the backend and MySQL database
+
+This is the easiest setup for a hackathon because the frontend is a Vite app and the backend already has a Railway-friendly Docker setup.
+
+### Deploy frontend on Vercel
+
+1. Push this repo to GitHub.
+2. In Vercel, import the repo.
+3. Set the **Root Directory** to `frontend`.
+4. Add the environment variable `VITE_API_URL=https://YOUR-BACKEND-DOMAIN/api`.
+5. Deploy.
+
+### Deploy backend on Railway
+
+1. In Railway, create a new project from GitHub.
+2. Select the `backend` folder if Railway asks for a root directory.
+3. Create or attach a MySQL database.
+4. Add these environment variables:
+   - `DB_URL`
+   - `DB_USERNAME`
+   - `DB_PASSWORD`
+   - `APP_CORS_ALLOWED_ORIGINS=https://YOUR-FRONTEND-DOMAIN`
+   - `APP_JWT_SECRET=some-long-random-secret`
+   - `APP_JWT_EXPIRATION_MS=86400000`
+   - `MAIL_USERNAME` and `MAIL_PASSWORD` if you want email notifications
+5. Deploy and open `https://YOUR-BACKEND-DOMAIN/api/health`.
+
+### Deploy backend on Render
+
+1. Create a new **Web Service** in Render from this repo.
+2. Point the service to the `backend` folder and use the Docker runtime.
+3. Set the same backend environment variables listed above.
+4. Open `/api/health` after deployment to confirm the backend is live.
+
+### Final connection step
+
+1. Copy your real backend URL.
+2. Put it into Vercel as `VITE_API_URL`.
+3. Set `APP_CORS_ALLOWED_ORIGINS` in the backend to your exact Vercel frontend URL.
+4. Redeploy both services if needed.
+
+### Common beginner mistakes
+
+- Forgetting to set `VITE_API_URL` in Vercel
+- Forgetting to set `APP_CORS_ALLOWED_ORIGINS` in Railway or Render
+- Using placeholder secrets in production
+- Using the wrong MySQL URL or password
+- Expecting the frontend to work before the backend health URL is live
 
 ## Roles
 
